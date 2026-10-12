@@ -437,3 +437,27 @@ Current development status: an initial WordPress migration writer is already imp
 Possible additional source adapters may include other abandoned or legacy CMS platforms when there is a realistic need and enough source data can be mapped safely.
 
 The project should avoid becoming a universal CMS converter. New adapters should only be added when they provide a practical path for users to recover valuable content into Geeklog.
+
+---
+
+# Next workstream: Legacy Geeklog Recovery (develop_1.1.0)
+
+**Status: planned.** The target remains a **fresh Geeklog 2.2.2** installation; older Geeklog and PHP versions are *sources*, not newly supported destination runtimes.
+
+## Deliverables
+
+- SQL-only recovery when the original PHP/Geeklog site cannot run, with no need to run obsolete source PHP on a public host.
+- Detect source schema signatures and prefixes; report version evidence and uncertainty, rather than guessing an exact version.
+- Inventory legacy plugin tables, missing columns, partial/damaged dumps, media references, unsupported records and recoverable types.
+- Add narrowly scoped historical import adapters where safe mappings exist; never execute untrusted source SQL directly on live target Core tables.
+- Make analysis and dry run read-only for destination content; require explicit administrator confirmation and a verified fresh-target baseline for actual writes.
+- Keep private per-site staging, persistent migration logs, source/target ID mapping, and original backup files safe from cache cleanup.
+- Export a verification report with counts, IDs, relationships, password handling, skipped data, missing media and possible redirect mapping.
+
+## Acceptance tests
+
+Test real sanitized historical schema fixtures, absent optional Polls tables, incomplete dumps, `.sql`/`.sql.gz`/single-SQL `.zip`, malicious or unsupported SQL, path traversal, multisite isolation, permission and CSRF failures, stale destination states, interrupted/repeated jobs, and data/relationship conservation. Record the exact tested source versions; no blanket promise of universal legacy compatibility.
+
+## Architecture boundary
+
+Migrator imports content into a clean site; **native Geeklog Install/Upgrade/Rescue** owns upgrades and recovery of existing installations; **Monitor** supplies diagnostics, not schema mutations. No additional Updator plugin. See [maintenance architecture](https://github.com/hostellerie/memorandum/blob/docs/geeklog-222-multisite-upgrade-lessons/geeklog-installer-upgrade-rescue-architecture.md).
