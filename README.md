@@ -160,3 +160,15 @@ Migrator converts Forum attachments into a dedicated MediaGallery album named `F
 - the dry run and migration report list the exact source and target file path for every attachment.
 
 Migrator migrates the database records only. The administrator must copy the physical files to the exact MediaGallery persistent-storage paths shown in the report. On a standard Geeklog 2.2.2 / MediaGallery 1.9.0 installation, Forum attachments therefore land under `public_html/images/mediagallery/orig/<first-character>/...`.
+
+## Legacy Geeklog Recovery direction (develop_1.1.0)
+
+Migrator is the **SQL-based data recovery tool**, not a Core updater. Administrators stranded on old Geeklog or PHP versions can recover content from a SQL dump into a **fresh Geeklog 2.2.2 installation**, without running their legacy CMS on current PHP. Preserve the original SQL dump and media files.
+
+**Planned improvements (not yet claimed supported):** detect historical Geeklog schema/version evidence and table prefixes; inventory legacy plugin tables; report missing or damaged data, available content, expected mapping, unsupported records, media dependencies, and URL/redirect needs. Historical versions must be advertised as supported only after fixture-based tests.
+
+Recommended sequence: back up source SQL and files → provision clean Geeklog 2.2.2 → upload a copy into private, site-isolated staging → analyze → dry run → confirm import explicitly → copy referenced media → verify counts, relationships, login/password behavior, URLs, and missing files. No production source changes or direct Core upgrade are performed by Migrator.
+
+**Responsibilities:** Migrator handles content import, adapters, ID mapping and reports. The native Geeklog installer/upgrade/rescue owns in-place Core upgrades, database upgrade checkpoints and recovery after failed upgrades. Monitor observes health and recommends actions. **No separate Updator plugin is planned.** See [maintenance architecture](https://github.com/hostellerie/memorandum/blob/docs/geeklog-222-multisite-upgrade-lessons/geeklog-installer-upgrade-rescue-architecture.md).
+
+Security requirements: administrator-only access, ACL and CSRF checks for writes, bounded and validated SQL/archive inputs, private persistent staging, a fresh-destination baseline, non-mutating dry run, and explicit reporting rather than silent data loss. MySQL DDL does not provide universal rollback.
